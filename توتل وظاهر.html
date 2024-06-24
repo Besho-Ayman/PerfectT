@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة العملات</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>حاسبة العملات</h1>
+
+    <h2> تحويل  إلى دولار</h2>
+    <table id="table1">
+        <thead>
+            <tr>
+                <th>سعر اليوزد (USD Rate)</th>
+                <th>كام المبلغ (Amount)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" id="usdRate" oninput="calculateTable1()"></td>
+                <td><input type="number" id="amount" value="10000" oninput="calculateTable1()"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2> حساب سعر البيرفكت</h2>
+    <table id="table2">
+        <thead>
+            <tr>
+                <th>بييرفكت (Perfect)</th>
+                <th>مصري (Egyptian Amount)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" id="perfect" value="20.1" oninput="calculateTable2()"></td>
+                <td><input type="number" id="egyptianAmount" value="1000" oninput="calculateTable2()"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2> حساب المبلغ الإجمالي</h2>
+    <table id="table3">
+        <thead>
+            <tr>
+                <th>في USD (In USD)</th>
+                <th>ناقص .5 (Minus 0.5%)</th>
+                <th>بكام بيرفكت (Total Perfect)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input type="number" id="inUsd" value="1.020" oninput="calculateTable3()"></td>
+                <td><input type="number" id="minusHalfPercent" readonly></td>
+                <td><input type="number" id="totalPerfect" readonly></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function calculateTable1() {
+            const usdRate = parseFloat(document.getElementById("usdRate").value);
+            const amount = parseFloat(document.getElementById("amount").value);
+
+            if (!isNaN(usdRate) && !isNaN(amount)) {
+                const usdAmount = amount / usdRate;
+                document.getElementById("buyUsd").value = usdAmount.toFixed(6);
+                calculateTable3(); // Update the third table calculations
+            }
+        }
+
+        function calculateTable2() {
+            const perfect = parseFloat(document.getElementById("perfect").value);
+            const egyptianAmount = parseFloat(document.getElementById("egyptianAmount").value);
+
+            if (!isNaN(perfect) && !isNaN(egyptianAmount)) {
+                const perfectRate = egyptianAmount / perfect;
+                document.getElementById("table3PerfectRate").value = perfectRate.toFixed(6);
+                calculateTable3(); // Update the third table calculations
+            }
+        }
+
+        function calculateTable3() {
+            const buyUsd = parseFloat(document.getElementById("buyUsd").value);
+            const inUsd = parseFloat(document.getElementById("inUsd").value);
+            const perfectRate = parseFloat(document.getElementById("table3PerfectRate").value);
+
+            if (!isNaN(buyUsd) && !isNaN(inUsd)) {
+                const totalAmount = buyUsd * inUsd;
+                const minusHalfPercent = totalAmount - (totalAmount * 0.005);
+                document.getElementById("minusHalfPercent").value = minusHalfPercent.toFixed(6);
+
+                if (!isNaN(perfectRate)) {
+                    const totalPerfect = perfectRate * minusHalfPercent;
+                    document.getElementById("totalPerfect").value = totalPerfect.toFixed(6);
+                }
+            }
+        }
+
+        // Hidden inputs to hold intermediate calculations
+        function createHiddenInputs() {
+            const hiddenInputs = [
+                { id: "usdAmount", type: "number", readonly: true },
+                { id: "buyUsd", type: "number", readonly: true },
+                { id: "totalAmount", type: "number", readonly: true },
+                { id: "perfectRate", type: "number", readonly: true },
+                { id: "table3PerfectRate", type: "number", readonly: true }
+            ];
+
+            hiddenInputs.forEach(input => {
+                const inputElement = document.createElement("input");
+                inputElement.type = input.type;
+                inputElement.id = input.id;
+                if (input.readonly) inputElement.readOnly = true;
+                inputElement.style.display = "none";
+                document.body.appendChild(inputElement);
+            });
+        }
+
+        // Initialize calculations on page load
+        window.onload = function() {
+            createHiddenInputs();
+            calculateTable2();
+        };
+    </script>
+
+</body>
+</html>
